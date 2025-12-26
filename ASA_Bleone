@@ -1,0 +1,793 @@
+
+<!DOCTYPE html> 
+<html>
+
+<head>
+<meta charset='utf-8' />
+<title>Canaux d'irrigation des ASA de la Bléone</title>
+
+<!-- Ce code sert à configurer les paramètres techniques de la page pour que les accents (é, à) s'affichent correctement. Il définit aussi le titre qui apparaîtra tout en haut sur l'onglet de votre navigateur internet. -->
+
+
+<link rel="stylesheet" href="reseau_irrig_bleone.css"> <!-- J'appelle le fichier CSS dans le même dossier -->
+
+
+
+<script src='https://api.mapbox.com/mapbox-gl-js/v2.4.1/mapbox-gl.js'></script>
+<link href='https://api.mapbox.com/mapbox-gl-js/v2.4.1/mapbox-gl.css' rel='stylesheet' />
+
+</head>
+<body>
+<header>
+		<a href='https://iut.univ-amu.fr/fr/formations/licences-professionnelles-desu/lp-cartographie-topographie-systemes-information-geographique'><img src='logo_IUT_blanc_RVB.png' alt='logo_amu' class='logo_amu'></a>
+</header>
+	
+	
+		
+	<h1>🎄Canaux d'irrigation des ASA de la Bléone🎄</h1>
+	
+	
+	<main>
+	<section>
+
+<!-- Ce code connecte la page au moteur Mapbox, ce qui est indispensable pour pouvoir afficher et faire fonctionner la carte interactive par la suite. Il construit également le haut de la page en affichant le logo de l'université et le titre principal du projet sur les canaux d'irrigation. -->
+
+
+<!-- Initialisation du plugin Geocoder-->
+
+<script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.min.js"></script>
+<link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css">
+
+<div id='map' class='map'></div>
+
+<div class='map-overlay-2 top'>
+  <div class='map-overlay-inner'>
+    <fieldset>
+      <label class="categoryLabel">🧑‍🎄LP SIG HACKATON 2025🧑‍🎄</label>
+
+	  <div>
+        <input type="checkbox" id="bleoneCB" value="bleone" onchange="switchlayer('bleone')"/> 
+        <label for="bleoneCB">Réseaux ASA</label>
+      </div>
+		<div>
+		<input type="checkbox" id="asaCB" value="asa" onchange="switchlayer('asa')"/> 
+		<label for="asaCB">ASA</label>
+		</div>
+	      <div>
+	        <input type="checkbox" id="route-bleueCB" value="route-bleue" onchange="switchlayer('route-bleue')"/>
+        <label for="route-bleueCB">Route bleue de la Bléone</label>
+      </div>
+      <div>
+        <input type="checkbox" id="itineraireCB" value="itineraire" onchange="switchlayer('itineraire')"/>
+        <label for="itineraireCB">Itinéraires PDIPR</label>
+      </div>
+
+    </fieldset>
+
+	<fieldset>
+			<label class="categoryLabel">🎁Equipements🎁</label>
+            
+
+			<div>
+                <input type="checkbox" id="siphCB" value="siph" onchange="switchlayer('siph')"/>
+                <label for="siphCB">Siphon</label>
+            </div> 
+		
+			<div>
+                <input type="checkbox" id="reglCB" value="regl" onchange="switchlayer('regl')"/>
+                <label for="reglCB">Règle</label>
+            </div>
+
+            <div>
+                <input type="checkbox" id="partCB" value="part" onchange="switchlayer('part')"/>
+                <label for="partCB">Partiteur</label>
+            </div>
+
+		    <div>
+                <input type="checkbox" id="pompCB" value="pomp" onchange="switchlayer('pomp')"/>
+                <label for="pompCB">Pompe</label>
+            </div>  
+      
+			<div>
+                <input type="checkbox" id="martCB" value="mart" onchange="switchlayer('mart')"/>
+                <label for="martCB">Martelière</label>
+            </div>
+
+			<div>
+        		<input type="checkbox" id="degCB" value="deg" onchange="switchlayer('deg')"/>
+        		<label for="degCB">Dégrilleur</label>
+      		</div>
+
+			<div>
+				<input type="checkbox" id="aqCB" value="aq" onchange="switchlayer('aq')"/>
+				<label for="aqCB">Aqueduc</label>
+			</div>
+	  </fieldset>
+
+    <fieldset>
+      <label class="categoryLabel">🫎Topographie🫎</label>
+	    <div>
+        <input type="checkbox" id="RPGCB" value="RPG" onchange="switchlayer('RPG')"/>
+        <label for="RPGCB">Occupation du sol</label>
+      </div>
+      <div>
+        <input type="checkbox" id="hydrologieCB" value="hydrologie" onchange="switchlayer('hydrologie')"/>
+        <label for="hydrologieCB">Hydrologie</label>
+      </div>
+      <div>
+        <input type="checkbox" id="Batiments_3DCB" value="Batiments_3D" onchange="switchlayer('Batiments_3D')"/>
+        <label for="Batiments_3DCB">Bâtiments 3D</label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <label class="categoryLabel">☃️Fonds de plan☃️</label>
+	    <div>
+        <input type="checkbox" id="orthoCB" value="ortho" onchange="switchlayer('ortho')"/>
+        <label for="orthoCB">Image satellite</label>
+      </div>
+      <div>
+        <input type="checkbox" id="cartoCB" value="carto" onchange="switchlayer('carto')"/>
+        <label for="cartoCB">Carte</label>
+      </div>
+    </fieldset>
+
+<fieldset>
+                <legend class="legend">Fond de carte</legend>
+                <div id="basemap-control" class="basemap-control legend">
+                    <select id="basemap-select">
+                      <option value="mapbox://styles/mapbox/streets-v11" selected>Streets</option>
+                      <option value="mapbox://styles/mapbox/outdoors-v11">Outdoors</option>
+                      <option value="mapbox://styles/mapbox/dark-v10">Dark</option>
+                      <option value="mapbox://styles/mapbox/satellite-v9">Satellite</option>
+                    </select>
+                  </div>
+            </fieldset>
+
+
+  </div>
+</div>
+<!-- Ce code permet d'afficher une carte interactive équipée d'une barre de recherche pour trouver une adresse. Il crée surtout un menu de contrôle qui permet à l'utilisateur de choisir quelles informations afficher comme les réseaux ou les équipements, et aussi de pouvoir changer le style du fond de carte. -->
+
+
+<!-- Légende RPG -->
+<div id='legend-rpg' class='map-legend' style='display: none'>
+  <h4>Occupation du sol RPG</h4>
+  <div class='legend-item'>
+    <span class='legend-color' style='background-color: #F79B8F;'></span>
+    <span>Arboriculture</span>
+  </div>
+  <div class='legend-item'>
+    <span class='legend-color' style='background-color: #EDBB47;'></span>
+    <span>Céréales</span>
+  </div>
+  <div class='legend-item'>
+    <span class='legend-color' style='background-color: #266E3D;'></span>
+    <span>Maraîchage</span>
+  </div>
+  <div class='legend-item'>
+    <span class='legend-color' style='background-color: #73520B;'></span>
+    <span>Oléagineux</span>
+  </div>
+  <div class='legend-item'>
+    <span class='legend-color' style='background-color: #C193C9;'></span>
+    <span>PAPAM</span>
+  </div>
+  <div class='legend-item'>
+    <span class='legend-color' style='background-color: #9BC993;'></span>
+    <span>Prairies</span>
+  </div>
+</div>
+<!-- Ce code crée une légende colorée qui aide l'utilisateur à lire la carte en associant une couleur précise à chaque type de culture. Il est configuré pour être caché par défaut afin de ne s'afficher à l'écran que lorsque l'utilisateur active la couche "Occupation du sol". -->
+
+<script>
+
+mapboxgl.accessToken = 
+'pk.eyJ1IjoiZGFibzIyIiwiYSI6ImNremltNXR2aTMxaG0ydW8xYmcwOGU3YjUifQ.33TjJKovMQpZ1dkC0S9K3Q';
+// Ce code fournit la clé d'accès obligatoire (token) qui permet au site de se connecter aux serveurs de Mapbox. Sans cette ligne, qui agit comme un mot de passe, la carte ne peut pas charger les images ni s'afficher à l'écran.
+
+
+// Configuration de la carte
+
+// ORTHOPHOTO
+var map = new mapboxgl.Map({
+container: 'map',
+style: 'mapbox://styles/mapbox/satellite-streets-v12',
+center: [6.1753, 44.06335],// Coordonnée en degré décimal 
+zoom: 12, // zoom
+pitch: 50, // Inclinaison
+bearing:31 // Rotation
+});
+// Ce code génère la carte interactive dans la page et lui donne son apparence de départ, ici une vue satellite. Il positionne également la caméra pour que la carte s'ouvre pile sur la Bléone proche de Digne-les-Bains, avec une inclinaison (pitch) et une rotation (bearing) pour donner un effet 3D.
+
+
+// Ecouteur du menu Select des fonds de carte
+document.getElementById('basemap-select').addEventListener('change', function(e) {
+    var newStyle = e.target.value;
+
+    // Récupération des paramètres actuels de la caméra
+    var currentCamera = {
+        center: map.getCenter(),
+        zoom: map.getZoom(),
+        pitch: map.getPitch(),
+        bearing: map.getBearing()
+    };
+
+    // Changer de style
+    map.setStyle(newStyle);
+
+    // Une fois le nouveau style chargé, ce code réapplique la position de la caméra et recharge toutes les couches
+    map.once('style.load', function() {
+        map.jumpTo(currentCamera);
+        addAllLayers(); // Réappliquer toutes les couches après le changement de style
+    });
+});
+// Ce code permet de changer le fond de carte de manière fluide. Son rôle crucial est de mémoriser exactement où on regardait (zoom, inclinaison, position) avant le changement pour rétablir cette vue immédiatement après. Sans cela, la carte risquerait de se réinitialiser et se renvoyer au point de départ à chaque changement de style.
+	
+
+// *** 1. APPEL DES COUCHES *** //
+
+	// AJout de donnees OSM
+
+// Fonction pour ajouter toutes les couches
+function addAllLayers() {
+	map.addSource('mapbox-dem', { // Définition de la source de donnée
+				'type': 'raster-dem',
+				'url': 'mapbox://mapbox.mapbox-terrain-dem-v1',  // On ajoute le MNE à notre carte
+				'tileSize': 512,
+				'maxzoom': 14
+			});
+     // Ajout du MNE et spécification de l'éxagération
+     map.setTerrain({ 'source': 'mapbox-dem', 'exaggeration': 1.5 }); // On ajoute une exagération de 1.5 pour la rendre réaliste, si on veut travailler sans que les icônes disparaissent, il faut mettre en commentaire ce map.setTerrain
+    
+	// Ce code transforme la carte plate en une carte en 3D en y ajoutant le relief grâce à des données d'altitude. Il configure aussi une exagération verticale (x1.5) pour que les pentes paraissent plus prononcées et le paysage plus lisible à l'écran.
+
+
+	// Ajout de l'occupation du sol (RPG)
+	map.addSource('RPG', { 
+		type: 'vector',
+		url: 'mapbox://dabo22.b21llohm'}); // Id du tileset de Mapbox
+			
+		map.addLayer({
+		'id': 'RPG', // Donner le nom que l'on souhaite
+		'type': 'fill',
+		'source': 'RPG', //Donner le nom que l'on souhaite
+		'source-layer':'RPG_ASAs_4326-9y53t2',
+		'layout': {'visibility': 'none'},
+		'paint': {
+			'fill-color': [
+				'match',
+				['get', 'Classeur10'],
+				'ARBORICULTURE', '#F79B8F', // Rouge
+				'CÉRÉALES', '#EDBB47', // Jaune
+				'MARAICHAGE', '#266E3D', // Bleu
+				'OLÉAGINEUX', '#73520B', // Vert
+				'PAPAM', '#C193C9', // Magenta
+				'PRAIRIES', '#9BC993', // Cyan
+				'#808080' // Couleur par défaut (gris)
+				],
+			'fill-opacity': 0.6
+		}
+		});
+// Ce code charge les données des parcelles agricoles (RPG) et les colorie automatiquement selon le type de culture (jaune pour les céréales, rouge pour les arbres, etc) grâce à une règle de style conditionnelle (match). Il configure cette couche pour qu'elle soit masquée par défaut (visibility: none) au chargement de la page, afin de ne pas surcharger la carte tant que l'utilisateur ne l'a pas demandée.
+		
+
+	// Ajout du périmètre des ASA
+	map.addSource('asa', {
+	type : 'vector',
+	url : 'mapbox://dabo22.c1xfg5g8'});
+
+	map.addLayer({
+	'id': 'asa',
+	'type': 'fill',
+	'source': 'asa',
+	'source-layer':'perimetre_asa_4326-d6053d',
+	'layout': {'visibility': 'none'},
+	'paint': {
+		'fill-color': [
+			'match',
+			['get', 'nom'],
+			// Remplacez les valeurs ci-dessous par les noms réels présents dans votre champ "nom"
+			'ASA du Canal de la Plaine de Gaubert', '#f94144',
+			'ASA du canal de la Grande Iscle', '#f3722c',
+			'ASA Canal du Nigas', '#90be6d',
+			/* valeur par défaut */ '#577590'
+			],
+		'fill-opacity': 0.45,
+		'fill-outline-color': '#333333'
+	},
+	});
+	//Ce code ajoute les périmètres des ASA sur la carte en coloriant chaque secteur différemment selon son nom pour bien les distinguer visuellement. Il configure aussi leur transparence pour laisser voir le fond de plan et garde ces zones masquées par défaut tant que l'utilisateur ne les active pas.
+
+
+	// Ajout itineraire randos pédestre, VTT, équestre au PDIPR
+			
+	map.addSource('itineraire', { 
+	type: 'vector',
+	url: 'mapbox://dabo22.cd4kvjsz'}); // Id du tileset de Mapbox
+			
+	map.addLayer({
+	'id': 'itineraire', // Donner le nom que l'on souhaite 
+	'type': 'line',
+	'source': 'itineraire', // Donner le nom que l'on souhaite 
+	'source-layer':'pdipr-7c2ley',
+	'layout': {'visibility': 'none', 'line-join': 'round','line-cap': 'round'},
+	'paint': {'line-width': 2, 'line-color': 'red',} // line-width et line-color quand le type est line, la couleur est rouge  
+	});
+	//Ce code ajoute les itinéraires de randos pédestres, VTT et équestre au PDIPR sur la carte en mettant son tracé en rouge. Il configure aussi leur transparence pour laisser voir le fond de plan et garde ces zones masquées par défaut tant que l'utilisateur ne les active pas.
+
+
+	// Ajout route bleue de la bléone
+			
+	map.addSource('route-bleue', { 
+	type: 'vector',
+	url: 'mapbox://dabo22.99iasv9y'}); // Id du tileset de Mapbox
+			
+	map.addLayer({
+	'id': 'route-bleue', // Donner le nom que l'on souhaite 
+	'type': 'line',
+	'source': 'route-bleue', // Donner le nom que l'on souhaite 
+	'source-layer':'sentier_touriste-76oftq',
+	'layout': {'visibility': 'none', 'line-join': 'round','line-cap': 'round'},
+	'paint': {'line-width': 2, 'line-color': 'yellow',} // bien mettre line-width et line-color quand le type est line, la couleur est jaune  
+	});
+	//Ce code ajoute la route bleue de la bléone sur la carte en mettant son tracé en jaune. Il configure aussi leur transparence pour laisser voir le fond de plan et garde ces zones masquées par défaut tant que l'utilisateur ne les active pas.
+	
+
+	// Ajout des canaux d'irrigation de la Bléone
+
+	map.addSource('bleone', { 
+	type: 'vector',
+	url: 'mapbox://dabo22.83ztmm3k'}); // Id du tileset de Mapbox 			
+	map.addLayer({
+	'id': 'bleone', // Donner le nom que l'on souhaite 		
+	'type': 'line',
+	'source': 'bleone', // Donner le nom que l'on souhaite 
+	'source-layer':'canaux_4326-57pv00',
+	'layout': {'visibility': 'none', 'line-join': 'round','line-cap': 'round'},
+	'paint': {'line-width': 2, 'line-color': [
+			'match',
+			['get', 'lib_type'],
+			'primaire', '#1f77b4',
+			'secondaire', '#17becf',
+			'souterrain', '#9edae5',
+			/* valeur par défaut */ '#aec7e8'
+	],} // line-width et line-color quand le type est line, la couleur est différente en fonction du type de canal.
+	});
+	//Ce code ajoute les canaux d'irrigation de la Bléone sur la carte en mettant son tracé en fonction du type de canal. Il configure aussi leur transparence pour laisser voir le fond de plan et garde ces zones masquées par défaut tant que l'utilisateur ne les active pas.
+
+
+		// *** EQUIPEMENTS ***
+
+		//Equipement des ASA Bléone !!!!
+
+	map.addSource('eqpmt', {
+    type: 'vector',  // La couche importée sera une couche vectorielle //
+    url: 'mapbox://dabo22.1xnj4tl8'  // On va chercher la couche des équipements sur Mapbox grâce à cette URL //
+	});
+
+	// Je travaille sur les équiments "siphon" ('id'= 'siph') de type 'circle' extraits de la couche "eqpmt" // 
+	
+	map.addLayer({
+    	'id': 'siph',
+    	'type': 'circle',
+    	'source': 'eqpmt',
+    	'source-layer': 'Equip4326-66b30p',
+		'filter' : ["all", ["==",'typ_nom','Siphon']],
+    	'layout': {
+        'visibility': 'none'
+    },
+    paint: {
+        'circle-radius': 6, // Le rayon des cercles représentant les siphons sera de 6 u (ces caractéristiques seront appliquées à tous les équipements => commentaires valables pour tous les autres équipements) //
+        'circle-opacity': 0.7, //L'opacité des cercles sera de 70% //
+        'circle-color': [
+            'match',
+            ['get', 'typ_equip'], // Je définis la couleur de chaque équipement //
+            'SIPH', '#FF0000',
+            'REGL', '#FFFF00',
+            'PART', '#0000FF',
+            'POMP', '#00FF00',
+            'MART', '#FF00FF',
+            'DEGR', '#00FFFF',
+            'AQUE', '#7A4E4E',
+            '#808080'
+        ]
+    }
+	});
+
+
+// Je travaille sur les équiments "règles" ('id'= 'regl') de type 'circle' extraits de la couche "eqpmt" // 
+	
+	map.addLayer({
+    	'id': 'regl',
+    	'type': 'circle',
+    	'source': 'eqpmt',
+    	'source-layer': 'Equip4326-66b30p',
+		'filter' : ["all", ["==",'typ_nom','Règle']],
+    	'layout': {
+        'visibility': 'none'
+    },
+    paint: {
+        'circle-radius': 6, 
+        'circle-opacity': 0.7,
+        'circle-color': [
+            'match',
+            ['get', 'typ_equip'],
+            'SIPH', '#FF0000',
+            'REGL', '#FFFF00',
+            'PART', '#0000FF',
+            'POMP', '#00FF00',
+            'MART', '#FF00FF',
+            'DEGR', '#00FFFF',
+            'AQUE', '#7A4E4E',
+            '#808080'
+        ]
+    }
+	});
+// Je travaille sur les équiments "partiteurs" ('id'= 'part') de type 'circle' extraits de la couche "eqpmt" // 
+
+	map.addLayer({
+    	'id': 'part',
+    	'type': 'circle',
+    	'source': 'eqpmt',
+    	'source-layer': 'Equip4326-66b30p',
+		'filter' : ["all", ["==",'typ_nom','Partiteur']],
+    	'layout': {
+        'visibility': 'none'
+    },
+    paint: {
+        'circle-radius': 6,
+        'circle-opacity': 0.7,
+        'circle-color': [
+            'match',
+            ['get', 'typ_equip'],
+            'SIPH', '#FF0000',
+            'REGL', '#FFFF00',
+            'PART', '#0000FF',
+            'POMP', '#00FF00',
+            'MART', '#FF00FF',
+            'DEGR', '#00FFFF',
+            'AQUE', '#7A4E4E',
+            '#808080'
+        ]
+    }
+	});
+// Je travaille sur les équiments "pompes" ('id'= 'pomp') de type 'circle' extraits de la couche "eqpmt" // 
+
+	map.addLayer({
+		'id': 'pomp',
+		'type': 'circle',
+		'source': 'eqpmt',
+		'source-layer': 'Equip4326-66b30p',
+		'filter' : ["all", ["==",'typ_nom','Pompe']],
+		'layout': {
+        'visibility': 'none'
+    },
+    paint: {
+        'circle-radius': 6,
+        'circle-opacity': 0.7,
+        'circle-color': [
+            'match',
+            ['get', 'typ_equip'],
+            'SIPH', '#FF0000',
+            'REGL', '#FFFF00',
+            'PART', '#0000FF',
+            'POMP', '#00FF00',
+            'MART', '#FF00FF',
+            'DEGR', '#00FFFF',
+            'AQUE', '#7A4E4E',
+            '#808080'
+        ]
+    }
+	})
+// Je travaille sur les équiments "martelières" ('id'= 'mart') de type 'circle' extraits de la couche "eqpmt" // 
+
+		map.addLayer({
+		'id': 'mart',
+		'type': 'circle',
+		'source': 'eqpmt',
+		'source-layer': 'Equip4326-66b30p',
+		'filter' : ["all", ["==",'typ_nom','Martelière']],
+		'layout': {
+        'visibility': 'none'
+    },
+    paint: {
+        'circle-radius': 6,
+        'circle-opacity': 0.7,
+        'circle-color': [
+            'match',
+            ['get', 'typ_equip'],
+            'SIPH', '#FF0000',
+            'REGL', '#FFFF00',
+            'PART', '#0000FF',
+            'POMP', '#00FF00',
+            'MART', '#FF00FF',
+            'DEGR', '#00FFFF',
+            'AQUE', '#7A4E4E',
+            '#808080'
+        ]
+    }
+	})
+// Je travaille sur les équiments "deg" ('id'= 'dégrilleur') de type 'circle' extraits de la couche "eqpmt" // 
+
+	map.addLayer({
+		'id': 'deg',
+		'type': 'circle',
+		'source': 'eqpmt',
+		'source-layer': 'Equip4326-66b30p',
+		'filter' : ["all", ["==",'typ_nom','Degrillage']],
+		'layout': {
+        'visibility': 'none'
+    },
+    paint: {
+      	  'circle-radius': 6,
+        'circle-opacity': 0.7,
+        'circle-color': [
+            'match',
+            ['get', 'typ_equip'],
+            'SIPH', '#FF0000',
+            'REGL', '#FFFF00',
+            'PART', '#0000FF',
+            'POMP', '#00FF00',
+            'MART', '#FF00FF',
+            'DEGR', '#00FFFF',
+            'AQUE', '#7A4E4E',
+            '#808080'
+        ]
+    }
+	})
+// Je travaille sur les équiments "aqueduc" ('id'= 'aq') de type 'circle' extraits de la couche "eqpmt" // 
+
+	map.addLayer({
+		'id': 'aq',
+		'type': 'circle',
+		'source': 'eqpmt',
+		'source-layer': 'Equip4326-66b30p',
+		'filter' : ["all", ["==",'typ_nom','Aqueduc']],
+		'layout': {
+        'visibility': 'none'
+    },
+    paint: {
+        'circle-radius': 6,
+        'circle-opacity': 0.7,
+        'circle-color': [
+            'match',
+            ['get', 'typ_equip'],
+            'SIPH', '#FF0000',
+            'REGL', '#FFFF00',
+            'PART', '#0000FF',
+            'POMP', '#00FF00',
+            'MART', '#FF00FF',
+            'DEGR', '#00FFFF',
+            'AQUE', '#7A4E4E',
+            '#808080'
+        ]
+    }
+	})
+
+	// Ajout des données OSM
+			
+	map.addSource('mapbox-streets-v8', { // J'ajoute la source pour afficher dessous les couches des données OSM 
+	type: 'vector', // Les fonds OSM seront de type vecteur //
+	url: 'mapbox://mapbox.mapbox-streets-v8'});  // Je vais chercher les fonds OSM en suivant l'URL //
+		
+		// Configuration de la couche de l'hydrographie
+
+		map.addLayer({"id": "hydrologie", //appel de couche car la source est la même que pour les routes (mapbox-streets-v8) 
+		"type": "line", // Couche de type "ligne" //
+		"source": "mapbox-streets-v8", // Je définis la source de ma couche //
+		"source-layer": "waterway",
+		'layout': {'visibility': 'none'},
+		"paint": {"line-color": "blue", // Les lignes de la couche seront symbolisées en bleu //
+		"line-width": 4} // La largeur des lignes sera de 4 u //
+		});
+			
+			
+		// Ajout batiments 3D OSM 
+		
+		map.addLayer({
+		'id': 'Batiments_3D', //appel de couche car la source est la même que pour les routes (mapbox-streets-v8)
+		'source': 'mapbox-streets-v8',  
+		'source-layer': 'building',
+		'layout': {'visibility': 'none'},
+		'filter': ['==', 'extrude', 'true'],
+		'type': 'fill-extrusion', // On extrude les batiments //
+		'minzoom': 15, // Le zoom minimal pour voir les bâtiments 3D est défini à 15 //
+		'paint': {'fill-extrusion-color': '#555555', 'fill-extrusion-height': 
+		{'type': 'identity','property': 'height'},
+		'fill-extrusion-base': {'type': 'identity','property': 'min_height'},
+		'fill-extrusion-opacity': 0.8
+		}
+		});	
+			
+		
+			 
+			// Ajout des bâtiments 
+		
+			map.addLayer({
+			"id": "batiments", // On ne prend que les éléments dont l'id est "batiments" //
+			"type": "fill", 
+			"source": "mapbox-streets-v8",
+			"source-layer": "building",
+			'layout': {'visibility': 'none'},
+			"paint": {"fill-color": "#FEFEFE", // Couleur des bâtiments définie par le code '#FEFEFE' soit un léger gris*//
+			"fill-opacity": 0.8} // L'opacité des bâtiments est de 80% //
+			});
+
+
+		// Configuration de la couche route
+
+		map.addLayer({ //On appel ici la couche de données des routes issues d’OSM 
+
+		"id": "Routes",  // On ne prend que les éléments dont l'id est "routes" //
+		"type": "line",  // Les éléments seront de type 'ligne' //
+		"source": "mapbox-streets-v8",
+		"layout": {'visibility': 'none'},
+		"source-layer": "road",
+		'layout': {'visibility': 'none'},
+		"filter": ["all",  ["in", "track", "street"]],   //On peut filtrer uniquement avec l'attribut "filter" les pistes forestières "track" et les petites voies "street", regarder toutes les options dans la doc Mapbox https://docs.mapbox.com/data/tilesets/reference/mapbox-streets-v8/#road
+		"paint": {"line-color": "#FF7F50", "line-width": 1} // On définit la couleur des route à orange selon le code hexadécimal #FF7F50 //
+		});
+			
+
+
+	// *** 2. FONCTIONS *** //
+		
+	 switchlayer = function (lname) {	
+    if (document.getElementById(lname + "CB").checked) {
+        map.setLayoutProperty(lname, 'visibility', 'visible');
+        // Affiche la légende RPG si la couche RPG est activée
+        if (lname === 'RPG') {
+            document.getElementById('legend-rpg').style.display = 'block';
+        }
+    } else {
+        map.setLayoutProperty(lname, 'visibility', 'none');
+        // Masque la légende RPG si la couche RPG est désactivée
+        if (lname === 'RPG') {
+            document.getElementById('legend-rpg').style.display = 'none';
+        }
+       }
+     }
+	// Ce code permet de basculer la visibilité des couches sur la carte en fonction de l'état des cases à cocher dans le menu. Il gère aussi l'affichage conditionnel de la légende pour l'occupation du sol en la montrant uniquement lorsque cette couche est activée.			
+			
+			// Geocoder
+			const geocoder = new MapboxGeocoder({
+			accessToken: mapboxgl.accessToken,
+			language: 'fr-FR', // Spécifie le français.
+			mapboxgl: mapboxgl
+			});
+			map.addControl(geocoder, 'bottom-right');	
+				
+		
+			// Ajout boutons navigation a la fin du script
+			var nav = new mapboxgl.NavigationControl();
+			map.addControl(nav, 'top-left');
+						
+						
+			// Ajout Echelle cartographique a la fin du script
+			map.addControl(new mapboxgl.ScaleControl({
+			maxWidth: 120,
+			unit: 'metric'}));
+			
+			
+			//*** 3. INTERACTIVITE UTILISATEUR ***//
+			
+			//Intéractivité lors du clic sur la couche des réseaux d'irrigation de la Bléone
+			map.on('click', function (e) { //Evenement au clic sur la couche bleone 
+			var features = map.queryRenderedFeatures(e.point, { layers: ['bleone'] });
+			if (!features.length) {
+			return;
+			}
+			var feature = features[0];
+			var popup = new mapboxgl.Popup({ offset: [0, -15] })
+			.setLngLat(e.lngLat)
+			.setHTML('<h3>' + feature.properties.lib_type + '</h3>') //Je lui fait afficher la valeur dans le champ nom de mon shp dans le Tileset Mapbox
+			.addTo(map);
+			});
+			//Récupérer l’objet cliqué dans la couche, cherche les entités affichées exactement sous le clic, mais uniquement dans la couche bleone.
+            //Affiche la couche bleone sous le clic, récupère sa propriété lib_type et l’affiche dans une popup positionnée à l’endroit exact du clic
+
+			// Interactivité au survol de la couche des réseaux d'irrigation de la Bléone (affiche le type de canal)
+			var bleoneHoverPopup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false });
+			map.on('mouseenter', 'bleone', function() {
+				map.getCanvas().style.cursor = 'pointer';
+			});
+			map.on('mouseleave', 'bleone', function() {
+				map.getCanvas().style.cursor = '';
+				bleoneHoverPopup.remove();
+			});
+			map.on('mousemove', 'bleone', function(e) {
+				var feature = e.features && e.features[0];
+				if (!feature) { bleoneHoverPopup.remove(); return; }
+				var name = feature.properties && feature.properties.lib_type ? feature.properties.lib_type : 'ASA';
+				bleoneHoverPopup.setLngLat(e.lngLat)
+					.setHTML('<strong>' + name + '</strong>')
+					.addTo(map);
+			});
+			//Lors du clic sur les couches réseaux d'irrigations, cela affiche les noms instantanément dans l'infobulle et la bulle disparaît dès que la souris s'éloigne. 
+
+			
+			// Interactivité au survol de la couche ASA (affiche le nom)
+			var asaHoverPopup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false });
+			map.on('mouseenter', 'asa', function() {
+				map.getCanvas().style.cursor = 'pointer';
+			});
+			map.on('mouseleave', 'asa', function() {
+				map.getCanvas().style.cursor = '';
+				asaHoverPopup.remove();
+			});
+			map.on('mousemove', 'asa', function(e) {
+				var feature = e.features && e.features[0];
+				if (!feature) { asaHoverPopup.remove(); return; }
+				var name = feature.properties && feature.properties.nom ? feature.properties.nom : 'ASA';
+				asaHoverPopup.setLngLat(e.lngLat)
+					.setHTML('<strong>' + name + '</strong>')
+					.addTo(map);
+			});
+			//Lors du clic SUR les different ASA le script récupère la première entité sous la souris, lit la propriété et positionne le popup à la position du pointeur. Cela affiche au final le nom en gras dans le popup.
+
+			// Interactivité au survol de la couche RPG (affiche Classeur10)
+			var RPGHoverPopup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false });
+			map.on('mouseenter', 'RPG', function() {
+				map.getCanvas().style.cursor = 'pointer';
+			});
+			map.on('mouseleave', 'RPG', function() {
+				map.getCanvas().style.cursor = '';
+				RPGHoverPopup.remove();
+			});
+			map.on('mousemove', 'RPG', function(e) {
+				var feature = e.features && e.features[0];
+				if (!feature) { RPGHoverPopup.remove(); return; }
+				var name = feature.properties && feature.properties.Classeur10 ? feature.properties.Classeur10 : 'type';
+				RPGHoverPopup.setLngLat(e.lngLat)
+					.setHTML('<strong>' + name + '</strong>')
+					.addTo(map);
+			});
+			// Au clique sur la couche RPG, cela place le popup à l’endroit où est la souris, met comme texte dedans, la valeur du RPG, écrit en gras, puis montre le popup sur la carte.
+
+
+			// --- Réinitialiser les checkboxes au chargement de la page
+			function resetCheckboxes() {
+				var cbs = document.querySelectorAll('.map-overlay-inner input[type="checkbox"]');
+				cbs.forEach(function(cb) {
+					try { cb.checked = false; } catch (e) { }
+				});
+
+				// Synchroniser la visibilité des couches si la carte est prête
+				if (typeof map !== 'undefined' && map && typeof map.getLayer === 'function') {
+					cbs.forEach(function(cb) {
+						var layer = cb.value;
+						try {
+							if (map.getLayer(layer)) map.setLayoutProperty(layer, 'visibility', 'none');
+						} catch (e) {
+							}
+					});
+				}
+			}
+			//Affiche toute les cases à cocher à zéro et masque les couches correspondantes sur la carte de sorte que lors du clic sur "Reset", les cases se vident et les couches disparaissent sur la carte.
+
+			// Appeler au chargement et après un court délai (au cas où les layers soient ajoutés plus tard)
+			window.addEventListener('load', function() {
+				resetCheckboxes();
+				setTimeout(resetCheckboxes, 600);
+			});
+
+}
+
+// Appeler la fonction au chargement initial de la carte
+map.on('load', function() {
+	addAllLayers();
+});
+
+	</script>
+
+</section>
+	</main>
+	
+	
+
+	<footer>
+		<a href="mailto:lilian.baumel@univ-amu.fr">Baumel Lilian</a>
+	</footer>
+</body>
+</html>
